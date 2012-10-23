@@ -1,0 +1,6 @@
+*.pyc
+*.rar
+*.bsddb
+*.sqlite
+.project
+.pydevproject
