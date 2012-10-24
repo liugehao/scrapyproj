@@ -9,4 +9,7 @@ class ArchivesItem(Item):
     title = Field()
     content = Field()
     url = Field()
-
+    type = Field()
+    image_urls = Field()
+    images = Field()
+    image_paths = Field()

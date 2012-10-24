@@ -15,11 +15,11 @@ USER_AGENT = '%s/%s' % (BOT_NAME, BOT_VERSION)
 
 
 #SPIDER_MIDDLEWARES = { 't1.middlewares.ignore.': 560 }
-#IMAGES_STORE = '/home/l/pyproject/t1/images'
-#ITEM_PIPELINES = ['blogarchives.pipelines.PGSQLStorePipeline','scrapy.contrib.pipeline.images.ImagesPipeline']
-ITEM_PIPELINES = ['blogarchives.pipelines.PGSQLStorePipeline']
+IMAGES_STORE = '/home/l/2t/scrapyproj/blogarchives/images'
+ITEM_PIPELINES = ['blogarchives.pipelines.PGSQLStorePipeline','blogarchives.pipelines.MyImagesPipeline']
+#ITEM_PIPELINES = ['blogarchives.pipelines.PGSQLStorePipeline']
 DUPEFILTER_CLASS = 'blogarchives.DupeFilter.RFPDupeFilter'
 
-#DEPTH_PRIORITY = 1
+DEPTH_PRIORITY = 10
 #SCHEDULER_DISK_QUEUE = 'scrapy.squeue.PickleFifoDiskQueue'
 #SCHEDULER_MEMORY_QUEUE = 'scrapy.squeue.FifoMemoryQueue'

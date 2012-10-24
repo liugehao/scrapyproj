@@ -20,9 +20,10 @@ class PGSQLStorePipeline(object):
         self.db = self.dbconn.cursor()
     def process_item(self, item, spider):
         # run db query in thread pool
-        self.db.execute('insert into itblog.archives (url,title,content) values(%(url)s , %(title)s , %(content)s )', 
+        if item['type'] != 'pic':
+            self.db.execute('insert into itblog.archives (url,title,content) values(%(url)s , %(title)s , %(content)s )', 
                           item)
-        self.dbconn.commit()
+            self.dbconn.commit()
          
         return item
      
@@ -30,6 +31,47 @@ class PGSQLStorePipeline(object):
     def handle_error(self, e):
         pass
         #log.err(e)
+        
+from scrapy.contrib.pipeline.images import ImagesPipeline
+from scrapy.exceptions import DropItem
+from scrapy.http import Request
+from scrapy.utils.response import get_base_url
+from scrapy.utils.url import urljoin_rfc
+import os
+from blogarchives import settings
+class MyImagesPipeline(ImagesPipeline):
+
+    
+    def get_media_requests(self, item, info):
+        for image_url in item['image_urls']:
+            print '-' * 100
+            print urljoin_rfc(item['url'],image_url)
+            yield Request(urljoin_rfc(item['url'],image_url))
+            
+    def item_completed(self, result, item, info):
+        for ok, x in result:
+            if ok:
+                #image filename change  to title
+                filename = os.path.join(settings.IMAGES_STORE,x['path']) 
+                
+                fn = os.path.basename(x['path']).split('.')
+                print filename,filename.replace(fn[0],item['title'])
+                os.rename(filename, filename.replace(fn[0],self.replaceBadCharOfFileName(item['title'])))
+                
+    def replaceBadCharOfFileName(self, fileName):
+        return fileName.replace("\\","").replace("/","").replace(":","").replace("*","").replace("?","").replace("\"","").replace("<","").replace(">","").replace("|","").replace(" ","") 
+        
+        
+    """
+    def item_completed(self, results, item, info):        
+        image_paths = dict([(x['url'],x['path']) for ok, x in results if ok])
+        if not image_paths:
+            raise DropItem("Item contains no images")
+        item['image_paths'] = image_paths.keys()
+        for x,y in image_paths.items():
+            item['content'][0] =item['content'][0].replace(x,y)
+        return item
+    """
 """
 class MysqlStorePipeline(object):
  
